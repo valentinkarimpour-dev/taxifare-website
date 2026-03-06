@@ -8,6 +8,30 @@ import time
 url = 'https://taxifare.lewagon.ai/predict'
 ###########################################
 
+# Light/dark mode toggle
+if "light_mode" not in st.session_state:
+    st.session_state.light_mode = False
+
+def toggle_mode():
+    st.session_state.light_mode = not st.session_state.light_mode
+
+st.button(
+    "☀️ Switch to Light Mode" if not st.session_state.light_mode else "🌙 Switch to Dark Mode",
+    on_click=toggle_mode
+)
+
+bg_color = "#ffffff" if st.session_state.light_mode else "#000000"
+text_color = "#000000" if st.session_state.light_mode else "#ffffff"
+
+st.markdown(f"""
+<style>
+[data-testid="stAppViewContainer"] {{ background-color: {bg_color}; }}
+[data-testid="stHeader"] {{ background-color: {bg_color}; }}
+[data-testid="stMain"] {{ background-color: {bg_color}; }}
+p, label, div {{ color: {text_color}; }}
+</style>
+""", unsafe_allow_html=True)
+
 st.markdown("""
     <style>
     button[data-testid="stNumberInputStepDown"],
@@ -67,21 +91,21 @@ params = {"pickup_datetime": str(datetime_input),
           "pickup_latitude": str(pickup_lat_input),
           "dropoff_longitude": str(dropoff_long_input),
           "dropoff_latitude": str(dropoff_lat_input),
-          "passenger_count": str(pass_count)
+          "passenger_count": int(pass_count)
 }
 
 prediction = requests.get(url=url, params=params)
 # prediction is a Response object — it has .status_code, .text, .json() etc.
 fare = prediction.json()["fare"]
 
-st.markdown("""
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
 
-div.stButton > button {
+div.stButton > button {{
     width: 220%;
     background-color: #e6b800;
-    color: #000000;
+    color: {text_color};
     font-family: 'Syne', sans-serif;
     font-size: 1.2rem;
     font-weight: 800;
@@ -91,32 +115,33 @@ div.stButton > button {
     padding: 0.85rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
-}
-div.stButton > button:hover {
-    background-color: #000000;
-    color: #ffffff;
-}
+}}
+div.stButton:nth-of-type(2) > button:hover {{
+    background-color: #fff4b3;
+    color: #000000;
+}}
 </style>
 """, unsafe_allow_html=True)
 
-if st.button("⚡⚡ CALCULATE FARE PRICE ⚡⚡"):
+
+if st.button("⚡⚡ CALCULATE FARE PRICE ⚡⚡", key="calculate_btn"):
     placeholder = st.empty()
     for i in range(4):
         placeholder.markdown("""
-            <div style="text-align: center; font-size: 1.3rem; color: white;">
+            <div style="text-align: center; font-size: 1.3rem; color: {text_color};">
                 🏃 Calculating...
             </div>
         """, unsafe_allow_html=True)
-        time.sleep(0.5)
+        time.sleep(0.3)
         placeholder.markdown("""
-            <div style="text-align: center; font-size: 1.3rem; color: white;">
+            <div style="text-align: center; font-size: 1.3rem; color: {text_color};">
                 &nbsp;&nbsp;&nbsp;&nbsp;Calculating... 🏃
             </div>
         """, unsafe_allow_html=True)
-        time.sleep(0.5)
+        time.sleep(0.1)
     placeholder.empty()
     st.markdown(f"""
-        <p style="text-align: center; font-size: 2rem; color: white; font-weight: bold;">
+        <p style="text-align: center; font-size: 2rem; color: {text_color}; font-weight: bold;">
             🚕 ${fare:.1f}
         </p>
     """, unsafe_allow_html=True)
@@ -147,4 +172,4 @@ st.pydeck_chart(pdk.Deck(
             get_radius=150,
         ),
     ]
-), height=200)  # 👈 adjust this value
+), height=400)  # 👈 adjust this value

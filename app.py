@@ -98,11 +98,11 @@ prediction = requests.get(url=url, params=params)
 # prediction is a Response object — it has .status_code, .text, .json() etc.
 fare = prediction.json()["fare"]
 
-st.markdown(f"""
+st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
 
-div.stButton > button {{
+div.stButton > button {
     width: 220%;
     background-color: #e6b800;
     color: {text_color};
@@ -115,14 +115,13 @@ div.stButton > button {{
     padding: 0.85rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
-}}
+}
 div.stButton:nth-of-type(2) > button:hover {{
     background-color: #fff4b3;
     color: #000000;
 }}
 </style>
 """, unsafe_allow_html=True)
-
 
 if st.button("⚡⚡ CALCULATE FARE PRICE ⚡⚡", key="calculate_btn"):
     placeholder = st.empty()
